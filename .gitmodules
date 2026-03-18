@@ -1,0 +1,3 @@
+[submodule "kernelsu_susfs_features"]
+	path = kernelsu_susfs_features
+	url = https://github.com/sidex15/ksu_module_susfs
