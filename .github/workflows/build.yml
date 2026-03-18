@@ -134,6 +134,5 @@ jobs:
           2. Flash boot.img:
 
              fastboot flash boot boot.img
-
-      
+             
          3. Reboot and enjoy 
