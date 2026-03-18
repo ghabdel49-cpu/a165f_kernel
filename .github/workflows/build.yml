@@ -135,5 +135,5 @@ jobs:
 
              fastboot flash boot boot.img
 
-          3. Or flash via TWRP/custom recovery
-          4. Reboot and enjoy 
+      
+         3. Reboot and enjoy 
