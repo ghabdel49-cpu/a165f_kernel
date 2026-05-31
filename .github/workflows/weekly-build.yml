@@ -125,7 +125,7 @@ jobs:
         export CROSS_COMPILE_COMPAT=arm-linux-gnueabi-
         export OUT_DIR="$OUT"
         export DIST_DIR="$OUT"
-        export BUILD_CONFIG="$OUT/build.config"
+        export BUILD_CONFIG="../out/target/product/a16/obj/KERNEL_OBJ/build.config"
         export MERGE_CONFIG="${GITHUB_WORKSPACE}/kernel-5.10/scripts/kconfig/merge_config.sh"
         export WDIR="${GITHUB_WORKSPACE}"
         export GKI_RAMDISK_PREBUILT_BINARY="${GITHUB_WORKSPACE}/oem_prebuilt_images/gki-ramdisk.lz4"
