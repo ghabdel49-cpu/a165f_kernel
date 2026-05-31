@@ -13,11 +13,6 @@ on:
         description: 'Version label blank for auto date'
         required: false
         default: ''
-      permissive:
-        description: 'Build permissive kernel (SELinux disabled)'
-        required: false
-        default: 'true'
-        type: boolean
 
 permissions:
   contents: write
@@ -93,19 +88,10 @@ jobs:
     - name: Set version
       run: |
         if [ -n "${{ github.event.inputs.build_version }}" ]; then
-          BASE_VERSION="${{ github.event.inputs.build_version }}"
+          echo "BUILD_VERSION=${{ github.event.inputs.build_version }}" >> $GITHUB_ENV
         else
-          BASE_VERSION="weekly-$(date +%Y%m%d)"
+          echo "BUILD_VERSION=weekly-$(date +%Y%m%d)" >> $GITHUB_ENV
         fi
-
-        if [ "${{ github.event.inputs.permissive }}" = "true" ]; then
-          echo "BUILD_VERSION=${BASE_VERSION}-permissive" >> $GITHUB_ENV
-          echo "PERMISSIVE=true" >> $GITHUB_ENV
-        else
-          echo "BUILD_VERSION=${BASE_VERSION}" >> $GITHUB_ENV
-          echo "PERMISSIVE=false" >> $GITHUB_ENV
-        fi
-
         BRANCH="${{ github.event.inputs.sukisu_branch }}"
         if [ -z "$BRANCH" ]; then
           BRANCH="main"
@@ -141,15 +127,12 @@ jobs:
           > custom_defconfigs/disable_knox.config
 
     - name: Write permissive defconfig
-      if: env.PERMISSIVE == 'true'
       run: |
         printf '%s\n' \
           'CONFIG_SECURITY_SELINUX_DEVELOP=y' \
           'CONFIG_SECURITY_SELINUX_BOOTPARAM=y' \
           'CONFIG_SECURITY_SELINUX_BOOTPARAM_VALUE=0' \
           > kernel-5.10/arch/arm64/configs/permissive.config
-        echo "=== Permissive SELinux config written ==="
-        cat kernel-5.10/arch/arm64/configs/permissive.config
 
     - name: Create root symlinks
       run: |
@@ -165,17 +148,10 @@ jobs:
         OUTDIR="${GITHUB_WORKSPACE}/out/target/product/a16/obj/KERNEL_OBJ"
         mkdir -p "$OUTDIR"
         rm -f "$OUTDIR/build.config" "$OUTDIR/build.config.gki.aarch64" "$OUTDIR/build.config.mtk"
-
-        OVERLAYS="entry_level.config"
-        if [ "${PERMISSIVE}" = "true" ]; then
-          OVERLAYS="${OVERLAYS} permissive.config"
-          echo "=== Building with permissive overlay ==="
-        fi
-
         cd "${GITHUB_WORKSPACE}/kernel-5.10"
         python3 scripts/gen_build_config.py \
           --kernel-defconfig a16_00_defconfig \
-          --kernel-defconfig-overlays "${OVERLAYS}" \
+          --kernel-defconfig-overlays "entry_level.config permissive.config" \
           -m user \
           -o "$OUTDIR/build.config"
         cd "${GITHUB_WORKSPACE}"
@@ -278,11 +254,11 @@ jobs:
         tag_name: ${{ env.BUILD_VERSION }}
         name: "SukiSU Ultra ${{ env.BUILD_VERSION }} ${{ env.SUKISU_BRANCH }}"
         body: |
-          SM-A165F / SM-A155F Auto Weekly Build
+          SM-A165F / SM-A155F Auto Build
 
           SukiSU-Ultra branch: ${{ env.SUKISU_BRANCH }}
           Build: ${{ env.BUILD_VERSION }}
-          SELinux: ${{ env.PERMISSIVE == 'true' && 'Permissive (disabled)' || 'Enforcing (default)' }}
+          SELinux: Permissive
 
           Flashing:
           boot.img - fastboot flash boot boot.img or TWRP
