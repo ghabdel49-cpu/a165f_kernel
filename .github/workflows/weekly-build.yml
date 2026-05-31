@@ -144,7 +144,6 @@ jobs:
         export AVB_BOOT_ALGORITHM=SHA256_RSA2048
         export AVB_BOOT_PARTITION_NAME=boot
         export LTO=none
-        sudo ln -sf "${GITHUB_WORKSPACE}/kernel/build" "${GITHUB_WORKSPACE}/build"
         cd "${GITHUB_WORKSPACE}/kernel"
         ./build/build.sh 2>&1 | tee "${GITHUB_WORKSPACE}/build.log"
         exit ${PIPESTATUS[0]}
