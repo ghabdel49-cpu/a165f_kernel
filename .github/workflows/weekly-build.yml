@@ -90,14 +90,14 @@ jobs:
         if [ -n "${{ github.event.inputs.build_version }}" ]; then
           echo "BUILD_VERSION=${{ github.event.inputs.build_version }}" >> $GITHUB_ENV
         else
-          echo "BUILD_VERSION=weekly-$(date +%Y%m%d)" >> $GITHUB_ENV
+          echo "BUILD_VERSION=weekly-$(date +%Y%m%d)-r${{ github.run_number }}" >> $GITHUB_ENV
         fi
         BRANCH="${{ github.event.inputs.sukisu_branch }}"
         if [ -z "$BRANCH" ]; then
           BRANCH="main"
         fi
         echo "SUKISU_BRANCH=$BRANCH" >> $GITHUB_ENV
-
+        
     - name: Integrate SukiSU-Ultra
       run: |
         cd kernel-5.10
